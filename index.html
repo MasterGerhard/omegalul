@@ -2,745 +2,605 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>omegalul.sol.site</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Lucky 7s Slot Machine</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
-    --bg: #04081a;
-    --surface: #0a1128;
-    --glow-cyan: #00f5ff;
-    --glow-pink: #ff2d78;
-    --glow-yellow: #ffe234;
-    --glow-purple: #bf5fff;
-    --text: #e8eaf6;
-    --muted: #5c6bc0;
+  html, body {
+    height: 100%;
   }
 
   body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    background: #0a0a0f;
     min-height: 100vh;
-    padding: 12px 8px 24px;
-    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
   }
 
-  /* Starfield */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 55% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.5) 0%, transparent 100%),
-      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 20% 85%, rgba(255,255,255,0.6) 0%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 65% 50%, rgba(255,255,255,0.4) 0%, transparent 100%),
-      radial-gradient(1px 1px at 45% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
-      radial-gradient(1px 1px at 85% 10%, rgba(255,255,255,0.5) 0%, transparent 100%);
-    pointer-events: none;
-    z-index: 0;
+  .stars {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,215,0,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(255,50,50,0.04) 0%, transparent 40%),
+      radial-gradient(ellipse at 60% 80%, rgba(100,50,255,0.04) 0%, transparent 40%);
   }
 
-  .wrapper {
+  .cabinet {
     position: relative;
     z-index: 1;
-    width: 100%;
-    max-width: 520px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+    width: min(460px, 96vw);
+    background: linear-gradient(180deg, #1a1020 0%, #12091a 100%);
+    border-radius: 24px;
+    border: 2px solid #3a2050;
+    box-shadow:
+      0 0 60px rgba(180,0,255,0.15),
+      0 0 120px rgba(180,0,255,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    padding: 16px 20px 20px;
   }
 
-  header {
+  .marquee {
     text-align: center;
-    letter-spacing: 0.3em;
+    margin-bottom: 8px;
   }
 
-  h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: clamp(1.4rem, 5vw, 2.2rem);
-    font-weight: 900;
-    color: var(--glow-cyan);
-    text-shadow: 0 0 20px var(--glow-cyan), 0 0 40px rgba(0,245,255,0.3);
-    letter-spacing: 0.2em;
+  .marquee-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 10vw, 52px);
+    letter-spacing: 6px;
+    line-height: 1;
+    background: linear-gradient(180deg, #fff700 0%, #ffaa00 50%, #ff6600 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255,200,0,0.5));
   }
 
-  .tagline {
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 0.4em;
-    margin-top: 2px;
-  }
-
-  .hud {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    width: 100%;
-    padding: 6px 12px;
-    background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.15);
-    border-radius: 4px;
-  }
-
-  .hud-item {
-    text-align: center;
-  }
-
-  .hud-label {
-    font-size: 0.6rem;
-    color: var(--muted);
-    letter-spacing: 0.2em;
+  .marquee-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: #ff4488;
+    margin-top: 1px;
     text-transform: uppercase;
   }
 
-  .hud-value {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-  }
-
-  #score-display { color: var(--glow-yellow); text-shadow: 0 0 8px rgba(255,226,52,0.6); }
-  #lives-display { color: var(--glow-pink); text-shadow: 0 0 8px rgba(255,45,120,0.6); }
-  #level-display { color: var(--glow-cyan); text-shadow: 0 0 8px rgba(0,245,255,0.6); }
-
-  canvas {
-    display: block;
-    background: var(--surface);
-    border: 1px solid rgba(0,245,255,0.2);
-    border-radius: 4px;
-    box-shadow: 0 0 30px rgba(0,245,255,0.08), inset 0 0 60px rgba(0,0,0,0.5);
-    cursor: none;
-    touch-action: none;
-  }
-
-  .lives-pips {
+  .lights-row {
     display: flex;
-    gap: 6px;
-    align-items: center;
     justify-content: center;
+    gap: 8px;
+    margin: 7px 0;
   }
 
-  .pip {
-    width: 8px; height: 8px;
+  .bulb {
+    width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--glow-pink);
-    box-shadow: 0 0 6px var(--glow-pink);
+    background: #ffcc00;
+    box-shadow: 0 0 6px #ffcc00;
+    animation: blink 1.2s infinite alternate;
+  }
+  .bulb:nth-child(even) { background: #ff4488; box-shadow: 0 0 6px #ff4488; animation-delay: 0.6s; }
+  .bulb:nth-child(3n) { background: #44ffaa; box-shadow: 0 0 6px #44ffaa; animation-delay: 0.3s; }
+
+  @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
+
+  .screen-frame {
+    background: #080810;
+    border-radius: 14px;
+    border: 3px solid #2a1540;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120,0,200,0.2);
+    padding: 14px;
+    margin-bottom: 12px;
   }
 
-  .pip.empty {
-    background: rgba(255,45,120,0.15);
-    box-shadow: none;
-  }
-
-  #overlay {
-    position: absolute;
-    inset: 0;
+  .reels-container {
     display: flex;
-    flex-direction: column;
+    gap: 8px;
+    height: 150px;
+    background: #04040c;
+    border-radius: 10px;
+    border: 2px solid #1a0a2a;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .reel-wrapper {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    border-right: 1px solid #1a0a2a;
+  }
+  .reel-wrapper:last-child { border-right: none; }
+
+  .reel { display: flex; flex-direction: column; transition: none; }
+
+  .reel.spinning { animation: spin-blur 0.1s steps(1) infinite; }
+
+  @keyframes spin-blur {
+    0%   { transform: translateY(0); }
+    25%  { transform: translateY(-50px); }
+    50%  { transform: translateY(-100px); }
+    75%  { transform: translateY(-150px); }
+    100% { transform: translateY(0); }
+  }
+
+  .symbol {
+    width: 100%;
+    height: 50px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(4, 8, 26, 0.88);
-    border-radius: 4px;
-    gap: 14px;
-    padding: 24px;
-    backdrop-filter: blur(4px);
+    font-size: 30px;
+    flex-shrink: 0;
+    user-select: none;
   }
 
-  #overlay.hidden { display: none; }
+  .win-line {
+    position: absolute; top: 50%; left: 0; right: 0;
+    height: 54px; transform: translateY(-50%);
+    border-top: 2px solid rgba(255,200,0,0.3);
+    border-bottom: 2px solid rgba(255,200,0,0.3);
+    pointer-events: none; z-index: 5;
+  }
+
+  .reel-highlight {
+    position: absolute; top: 50%; left: 0; right: 0;
+    height: 54px; transform: translateY(-50%);
+    background: rgba(255,215,0,0.05);
+    pointer-events: none; z-index: 4;
+  }
+
+  .paytable {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-top: 10px;
+  }
+
+  .pay-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 7px;
+    padding: 5px 8px;
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 11px;
+    color: #aaa;
+  }
+
+  .pay-symbols { font-size: 15px; letter-spacing: -2px; }
+  .pay-mult { margin-left: auto; font-family: 'Orbitron', monospace; font-size: 10px; color: #ffcc00; font-weight: 700; }
+
+  .info-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .info-card {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 7px 10px;
+    text-align: center;
+  }
+
+  .info-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 2px;
+    font-family: 'Orbitron', monospace;
+  }
+
+  .info-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .info-value.balance { color: #44ffaa; }
+  .info-value.win { color: #ffcc00; }
+
+  .controls { display: flex; flex-direction: column; gap: 9px; }
+
+  .bet-section { display: flex; align-items: center; gap: 8px; }
+
+  .bet-label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: #666; font-family: 'Orbitron', monospace; white-space: nowrap;
+  }
+
+  .bet-buttons { display: flex; gap: 5px; flex: 1; }
+
+  .bet-btn {
+    flex: 1; padding: 7px 2px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px;
+    color: #ccc;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .bet-btn:hover { background: rgba(255,200,0,0.1); border-color: rgba(255,200,0,0.3); color: #ffcc00; }
+  .bet-btn.active { background: rgba(255,200,0,0.15); border-color: #ffcc00; color: #ffcc00; box-shadow: 0 0 10px rgba(255,200,0,0.2); }
+
+  .spin-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(180deg, #ff6600 0%, #cc2200 100%);
+    border: none; border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px; letter-spacing: 4px; color: #fff;
+    cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 4px 20px rgba(255,80,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative; overflow: hidden;
+  }
+
+  .spin-btn::after {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    transition: left 0.4s;
+  }
+  .spin-btn:hover::after { left: 150%; }
+  .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,80,0,0.5); }
+  .spin-btn:active { transform: translateY(0); }
+  .spin-btn:disabled { background: linear-gradient(180deg, #444 0%, #222 100%); box-shadow: none; cursor: not-allowed; color: #888; }
+
+  .message-area {
+    text-align: center; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .message {
+    font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; color: #ffcc00;
+    text-shadow: 0 0 20px rgba(255,200,0,0.5);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .message.visible { opacity: 1; }
+
+  .progress-bar {
+    background: rgba(255,255,255,0.06); border-radius: 5px;
+    height: 5px; margin-top: 10px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #44ffaa, #ffcc00);
+    border-radius: 5px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .progress-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 3px; font-size: 9px; color: #555;
+    font-family: 'Orbitron', monospace;
+  }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+    z-index: 100; display: none; align-items: center;
+    justify-content: center; flex-direction: column; gap: 16px;
+  }
+  .overlay.show { display: flex; }
 
   .overlay-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: clamp(1.2rem, 4vw, 2rem);
-    font-weight: 900;
-    text-align: center;
-    color: var(--glow-cyan);
-    text-shadow: 0 0 20px var(--glow-cyan);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; letter-spacing: 6px; text-align: center; line-height: 1;
+  }
+  .overlay-title.win-title {
+    background: linear-gradient(180deg, #fff700 0%, #ffaa00 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; filter: drop-shadow(0 0 40px rgba(255,200,0,0.6));
+  }
+  .overlay-title.lose-title { color: #ff2244; filter: drop-shadow(0 0 40px rgba(255,0,50,0.5)); }
+
+  .overlay-sub { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px; color: #aaa; text-align: center; }
+
+  .restart-btn {
+    padding: 14px 44px;
+    background: linear-gradient(180deg, #ff6600 0%, #cc2200 100%);
+    border: none; border-radius: 12px;
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 4px; color: #fff;
+    cursor: pointer; box-shadow: 0 4px 24px rgba(255,80,0,0.4); transition: all 0.15s; margin-top: 6px;
+  }
+  .restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,80,0,0.5); }
+
+  .win-flash { animation: winPulse 0.5s ease-out 3; }
+
+  @keyframes winPulse {
+    0%   { box-shadow: 0 0 60px rgba(180,0,255,0.15), 0 0 120px rgba(180,0,255,0.08); }
+    50%  { box-shadow: 0 0 80px rgba(255,215,0,0.4), 0 0 160px rgba(255,215,0,0.2); }
+    100% { box-shadow: 0 0 60px rgba(180,0,255,0.15), 0 0 120px rgba(180,0,255,0.08); }
   }
 
-  .overlay-sub {
-    font-size: 0.8rem;
-    color: var(--muted);
-    text-align: center;
-    letter-spacing: 0.15em;
-    max-width: 280px;
-    line-height: 1.6;
+  @keyframes symbolLand {
+    0% { transform: scale(1.3); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
   }
-
-  .btn {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    padding: 10px 28px;
-    background: transparent;
-    color: var(--glow-cyan);
-    border: 1.5px solid var(--glow-cyan);
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-    text-transform: uppercase;
-  }
-
-  .btn:hover {
-    background: rgba(0,245,255,0.1);
-    box-shadow: 0 0 16px rgba(0,245,255,0.3);
-    transform: scale(1.04);
-  }
-
-  .btn:active { transform: scale(0.97); }
-
-  .btn.danger {
-    color: var(--glow-pink);
-    border-color: var(--glow-pink);
-  }
-  .btn.danger:hover {
-    background: rgba(255,45,120,0.1);
-    box-shadow: 0 0 16px rgba(255,45,120,0.3);
-  }
-
-  .canvas-container {
-    position: relative;
-    width: 100%;
-  }
-
-  .controls-hint {
-    font-size: 0.62rem;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-align: center;
-  }
-
-  .level-banner {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    text-align: center;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    color: var(--glow-yellow);
-    padding: 6px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-
-  .level-banner.show { opacity: 1; }
+  .symbol.landing { animation: symbolLand 0.2s ease-out; }
 </style>
 </head>
 <body>
-<div class="wrapper">
-  <header>
-    <h1>BRICKBREAKER</h1>
-    <div class="tagline">ARCADE EDITION — 5 LEVELS</div>
-  </header>
 
-  <div class="hud">
-    <div class="hud-item">
-      <div class="hud-label">Score</div>
-      <div class="hud-value" id="score-display">0</div>
-    </div>
-    <div class="hud-item">
-      <div class="hud-label">Level</div>
-      <div class="hud-value" id="level-display">1</div>
-    </div>
-    <div class="hud-item">
-      <div class="hud-label">Lives</div>
-      <div class="hud-value" id="lives-display">
-        <div class="lives-pips">
-          <span class="pip" id="pip1"></span>
-          <span class="pip" id="pip2"></span>
-          <span class="pip" id="pip3"></span>
+<div class="stars"></div>
+
+<div class="cabinet" id="cabinet">
+  <div class="marquee">
+    <div class="marquee-title">Lucky 7s</div>
+    <div class="marquee-sub">Classic Slots &bull; 98% RTP</div>
+  </div>
+
+  <div class="lights-row">
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+    <div class="bulb"></div><div class="bulb"></div><div class="bulb"></div>
+  </div>
+
+  <div class="screen-frame">
+    <div class="reels-container" id="reels-container">
+      <div class="reel-wrapper">
+        <div class="reel" id="reel0">
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
         </div>
+        <div class="reel-highlight"></div>
+      </div>
+      <div class="reel-wrapper">
+        <div class="reel" id="reel1">
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
+        </div>
+        <div class="reel-highlight"></div>
+      </div>
+      <div class="reel-wrapper">
+        <div class="reel" id="reel2">
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div>
+        </div>
+        <div class="reel-highlight"></div>
+      </div>
+      <div class="win-line"></div>
+    </div>
+
+    <div class="paytable">
+      <div class="pay-row"><span class="pay-symbols">7️⃣7️⃣7️⃣</span><span class="pay-mult">×100</span></div>
+      <div class="pay-row"><span class="pay-symbols">⭐⭐⭐</span><span class="pay-mult">×20</span></div>
+      <div class="pay-row"><span class="pay-symbols">🔔🔔🔔</span><span class="pay-mult">×10</span></div>
+      <div class="pay-row"><span class="pay-symbols">🍇🍇🍇</span><span class="pay-mult">×5</span></div>
+      <div class="pay-row"><span class="pay-symbols">🍋🍋🍋</span><span class="pay-mult">×4</span></div>
+      <div class="pay-row"><span class="pay-symbols">🍒🍒🍒</span><span class="pay-mult">×3</span></div>
+      <div class="pay-row"><span class="pay-symbols">🍒🍒</span><span class="pay-mult">×1.5</span></div>
+      <div class="pay-row"><span class="pay-symbols">7️⃣</span><span class="pay-mult">×1.5×</span></div>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-card">
+      <div class="info-label">Balance</div>
+      <div class="info-value balance" id="balance-display">$20.00</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Last Win</div>
+      <div class="info-value win" id="win-display">—</div>
+    </div>
+    <div class="info-card">
+      <div class="info-label">Bet</div>
+      <div class="info-value" id="bet-display" style="color:#ff8844;">$0.20</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="bet-section">
+      <span class="bet-label">Bet</span>
+      <div class="bet-buttons">
+        <button class="bet-btn active" onclick="setBet(0)">$0.20</button>
+        <button class="bet-btn" onclick="setBet(1)">$0.50</button>
+        <button class="bet-btn" onclick="setBet(2)">$1.00</button>
+        <button class="bet-btn" onclick="setBet(3)">$2.00</button>
+        <button class="bet-btn" onclick="setBet(4)">$5.00</button>
       </div>
     </div>
-  </div>
 
-  <div class="canvas-container">
-    <canvas id="gameCanvas"></canvas>
-    <div id="overlay">
-      <div class="overlay-title" id="overlay-title">BRICKBREAKER</div>
-      <div class="overlay-sub" id="overlay-sub">Destroy all bricks to advance.<br>Don't let the ball fall!</div>
-      <button class="btn" id="overlay-btn" onclick="startGame()">START GAME</button>
+    <button class="spin-btn" id="spin-btn" onclick="spin()">SPIN</button>
+
+    <div class="message-area">
+      <div class="message" id="message"></div>
     </div>
   </div>
 
-  <div class="controls-hint">MOUSE or TOUCH to move paddle &nbsp;·&nbsp; SPACE to launch</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+  <div class="progress-labels">
+    <span>$0</span>
+    <span>Goal: $100</span>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-title" id="overlay-title"></div>
+  <div class="overlay-sub" id="overlay-sub"></div>
+  <button class="restart-btn" onclick="restart()">PLAY AGAIN</button>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const overlay = document.getElementById('overlay');
-const overlayTitle = document.getElementById('overlay-title');
-const overlaySub = document.getElementById('overlay-sub');
-const overlayBtn = document.getElementById('overlay-btn');
+const BETS = [0.20, 0.50, 1.00, 2.00, 5.00];
+const START_BALANCE = 20;
+const WIN_GOAL = 100;
+const RTP = 0.98;
+const SYMBOLS = ['7️⃣', '⭐', '🔔', '🍇', '🍋', '🍒'];
+const WEIGHTS = [2, 4, 7, 12, 18, 30];
+const TOTAL_WEIGHT = WEIGHTS.reduce((a, b) => a + b, 0);
+const PAYOUTS = { '7️⃣7️⃣7️⃣': 100, '⭐⭐⭐': 20, '🔔🔔🔔': 10, '🍇🍇🍇': 5, '🍋🍋🍋': 4, '🍒🍒🍒': 3 };
 
-// Responsive sizing
-function resize() {
-  const maxW = Math.min(window.innerWidth - 16, 520);
-  canvas.width = maxW;
-  canvas.height = Math.round(maxW * 1.1);
+let balance = START_BALANCE;
+let currentBet = 0;
+let spinning = false;
+let msgTimer = null;
+
+function weightedRandom() {
+  let r = Math.random() * TOTAL_WEIGHT;
+  for (let i = 0; i < WEIGHTS.length; i++) { r -= WEIGHTS[i]; if (r <= 0) return i; }
+  return SYMBOLS.length - 1;
 }
-resize();
-window.addEventListener('resize', () => { resize(); if (gameState !== 'playing') drawIdle(); });
 
-// Game constants
-const COLS = 10;
-const BRICK_PAD = 4;
-const PADDLE_H = 10;
-const BALL_R = 7;
-const LIVES_MAX = 3;
-const LEVELS = [
-  { rows: 4, speed: 4.0, name: "SECTOR ONE",   colors: ["#ff2d78","#ff6ba8","#ff9fc9","#ffc8df"] },
-  { rows: 5, speed: 4.8, name: "SECTOR TWO",   colors: ["#00f5ff","#33f8ff","#66faff","#99fcff","#ccfeff"] },
-  { rows: 5, speed: 5.5, name: "SECTOR THREE", colors: ["#ffe234","#ffd700","#ffcd00","#ffc300","#ffb700"] },
-  { rows: 6, speed: 6.2, name: "SECTOR FOUR",  colors: ["#bf5fff","#9933ff","#7700ff","#6600dd","#5500bb","#440099"] },
-  { rows: 7, speed: 7.0, name: "FINAL SECTOR", colors: ["#ff2d78","#ff6600","#ffe234","#00f5ff","#bf5fff","#ff2d78","#ffffff"] },
-];
+function calcMultiplier(s0, s1, s2) {
+  const key = s0 + s1 + s2;
+  if (PAYOUTS[key]) return PAYOUTS[key];
+  const count7 = [s0, s1, s2].filter(s => s === '7️⃣').length;
+  if (count7 >= 1 && (s0 === '7️⃣' || s1 === '7️⃣')) return 1.5;
+  const cherries = [s0, s1, s2].filter(s => s === '🍒');
+  if (cherries.length === 2) return 1.5;
+  return 0;
+}
 
-let gameState = 'idle'; // idle | playing | paused | dead | won | gameover
-let score = 0, lives = LIVES_MAX, level = 0;
-let bricks = [], ball = {}, paddle = {};
-let animId = null, ballLaunched = false;
-let particles = [];
-let flashTimer = 0;
-let highScore = 0;
-
-function brickWidth() { return (canvas.width - BRICK_PAD * (COLS + 1)) / COLS; }
-function brickHeight() { return Math.round(canvas.height * 0.045); }
-function paddleW() { return Math.round(canvas.width * 0.18); }
-function paddleY() { return canvas.height - 40; }
-
-function buildBricks() {
-  const lvl = LEVELS[level];
-  bricks = [];
-  const bw = brickWidth(), bh = brickHeight();
-  for (let r = 0; r < lvl.rows; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const hits = level >= 3 && r === 0 ? 2 : 1; // top row on later levels needs 2 hits
-      bricks.push({
-        x: BRICK_PAD + c * (bw + BRICK_PAD),
-        y: 60 + r * (bh + BRICK_PAD),
-        w: bw, h: bh,
-        color: lvl.colors[r % lvl.colors.length],
-        alive: true,
-        hits: hits,
-        maxHits: hits,
-      });
-    }
+function getExpectedRTP() {
+  let totalEV = 0;
+  const n = SYMBOLS.length;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) for (let k = 0; k < n; k++) {
+    const p = (WEIGHTS[i]/TOTAL_WEIGHT)*(WEIGHTS[j]/TOTAL_WEIGHT)*(WEIGHTS[k]/TOTAL_WEIGHT);
+    totalEV += p * calcMultiplier(SYMBOLS[i], SYMBOLS[j], SYMBOLS[k]);
   }
+  return totalEV;
 }
 
-function resetBall() {
-  ball = {
-    x: canvas.width / 2,
-    y: paddleY() - BALL_R - 2,
-    dx: 0, dy: 0,
-    r: BALL_R,
-    trail: [],
-  };
-  ballLaunched = false;
-}
+const BASE_RTP = getExpectedRTP();
 
-function resetPaddle() {
-  paddle = {
-    x: canvas.width / 2 - paddleW() / 2,
-    y: paddleY(),
-    w: paddleW(),
-    h: PADDLE_H,
-    target: canvas.width / 2,
-  };
-}
-
-function initLevel() {
-  buildBricks();
-  resetPaddle();
-  resetBall();
-  updateHUD();
-}
-
-function startGame() {
-  score = 0; lives = LIVES_MAX; level = 0;
-  overlay.classList.add('hidden');
-  gameState = 'playing';
-  initLevel();
-  cancelAnimationFrame(animId);
-  loop();
-}
-
-function nextLevel() {
-  level++;
-  if (level >= LEVELS.length) {
-    endGame(true);
-    return;
+function spinSymbols() {
+  const raw = [weightedRandom(), weightedRandom(), weightedRandom()];
+  const naturalMult = calcMultiplier(SYMBOLS[raw[0]], SYMBOLS[raw[1]], SYMBOLS[raw[2]]);
+  const naturalWin = naturalMult * BETS[currentBet];
+  const naturalEV = naturalWin - BETS[currentBet];
+  const targetEV = (RTP - 1) * BETS[currentBet];
+  const evGap = targetEV - naturalEV;
+  const blendFactor = Math.min(1, Math.abs(evGap) / (BETS[currentBet] * 0.5));
+  const shouldNudge = Math.random() < blendFactor * 0.4;
+  if (shouldNudge) {
+    if (evGap > 0 && naturalMult === 0) { if (Math.random() < 0.3) { raw[0] = SYMBOLS.indexOf('🍒'); raw[1] = SYMBOLS.indexOf('🍒'); } }
+    else if (evGap < 0 && naturalMult > 3) { raw[2] = Math.floor(Math.random() * 3) + 3; }
   }
-  gameState = 'playing';
-  initLevel();
+  return raw.map(i => SYMBOLS[i]);
 }
 
-function loseLife() {
-  lives--;
-  updateHUD();
-  if (lives <= 0) {
-    endGame(false);
-  } else {
-    gameState = 'dead';
+function setBet(idx) {
+  if (spinning) return;
+  currentBet = idx;
+  document.querySelectorAll('.bet-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  document.getElementById('bet-display').textContent = '$' + BETS[idx].toFixed(2);
+}
+
+function setReelSymbols(reelId, top, mid, bottom) {
+  const reel = document.getElementById(reelId);
+  const syms = reel.querySelectorAll('.symbol');
+  syms[0].textContent = top; syms[1].textContent = mid; syms[2].textContent = bottom;
+}
+
+function showMessage(text, duration = 2000) {
+  const el = document.getElementById('message');
+  el.textContent = text; el.classList.add('visible');
+  clearTimeout(msgTimer);
+  if (duration > 0) msgTimer = setTimeout(() => el.classList.remove('visible'), duration);
+}
+
+function hideMessage() { document.getElementById('message').classList.remove('visible'); }
+
+function updateUI() {
+  document.getElementById('balance-display').textContent = '$' + balance.toFixed(2);
+  const pct = Math.min(100, Math.max(0, (balance / WIN_GOAL) * 100));
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function spin() {
+  if (spinning) return;
+  if (balance < BETS[currentBet]) { showMessage('INSUFFICIENT FUNDS'); return; }
+  spinning = true; hideMessage();
+  document.getElementById('spin-btn').disabled = true;
+  document.getElementById('win-display').textContent = '—';
+  balance -= BETS[currentBet];
+  balance = Math.round(balance * 100) / 100;
+  updateUI();
+  const results = spinSymbols();
+  for (let i = 0; i < 3; i++) document.getElementById('reel' + i).classList.add('spinning');
+  [600, 900, 1200].forEach((delay, reelIdx) => {
     setTimeout(() => {
-      if (gameState === 'dead') {
-        resetBall();
-        resetPaddle();
-        gameState = 'playing';
-      }
-    }, 800);
-  }
-}
-
-function endGame(won) {
-  gameState = won ? 'won' : 'gameover';
-  highScore = Math.max(highScore, score);
-  if (won) {
-    overlayTitle.textContent = 'YOU WIN!';
-    overlayTitle.style.color = 'var(--glow-yellow)';
-    overlayTitle.style.textShadow = '0 0 20px var(--glow-yellow)';
-    overlaySub.textContent = `All sectors cleared!\nFinal score: ${score.toLocaleString()}`;
-  } else {
-    overlayTitle.textContent = 'GAME OVER';
-    overlayTitle.style.color = 'var(--glow-pink)';
-    overlayTitle.style.textShadow = '0 0 20px var(--glow-pink)';
-    overlaySub.textContent = `Score: ${score.toLocaleString()}\nHigh score: ${highScore.toLocaleString()}`;
-  }
-  overlayBtn.textContent = 'PLAY AGAIN';
-  overlayBtn.onclick = startGame;
-  overlay.classList.remove('hidden');
-}
-
-function updateHUD() {
-  document.getElementById('score-display').textContent = score.toLocaleString();
-  document.getElementById('level-display').textContent = level + 1;
-  for (let i = 1; i <= 3; i++) {
-    const pip = document.getElementById('pip' + i);
-    pip.classList.toggle('empty', i > lives);
-  }
-}
-
-// Input
-let mouseX = canvas.width / 2;
-canvas.addEventListener('mousemove', e => {
-  const rect = canvas.getBoundingClientRect();
-  mouseX = e.clientX - rect.left;
-});
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  mouseX = e.touches[0].clientX - rect.left;
-}, { passive: false });
-canvas.addEventListener('click', launch);
-canvas.addEventListener('touchend', launch, { passive: true });
-document.addEventListener('keydown', e => {
-  if (e.code === 'Space') { e.preventDefault(); launch(); }
-});
-
-function launch() {
-  if (gameState !== 'playing' || ballLaunched) return;
-  const lvl = LEVELS[level];
-  const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.6;
-  ball.dx = Math.cos(angle) * lvl.speed;
-  ball.dy = Math.sin(angle) * lvl.speed;
-  ballLaunched = true;
-}
-
-// Particles
-function spawnParticles(x, y, color, count = 8) {
-  for (let i = 0; i < count; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 1 + Math.random() * 3;
-    particles.push({
-      x, y,
-      dx: Math.cos(angle) * speed,
-      dy: Math.sin(angle) * speed,
-      color,
-      life: 1,
-      decay: 0.04 + Math.random() * 0.04,
-      r: 2 + Math.random() * 3,
-    });
-  }
-}
-
-function updateParticles() {
-  particles = particles.filter(p => p.life > 0);
-  for (const p of particles) {
-    p.x += p.dx;
-    p.y += p.dy;
-    p.dy += 0.08;
-    p.life -= p.decay;
-  }
-}
-
-function drawParticles() {
-  for (const p of particles) {
-    ctx.globalAlpha = p.life;
-    ctx.fillStyle = p.color;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 1;
-}
-
-// Physics
-function update() {
-  if (gameState !== 'playing') return;
-
-  // Move paddle
-  const targetX = mouseX - paddle.w / 2;
-  paddle.x += (targetX - paddle.x) * 0.18;
-  paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, paddle.x));
-
-  if (!ballLaunched) {
-    ball.x = paddle.x + paddle.w / 2;
-    ball.y = paddleY() - BALL_R - 2;
-    return;
-  }
-
-  // Ball trail
-  ball.trail.push({ x: ball.x, y: ball.y });
-  if (ball.trail.length > 8) ball.trail.shift();
-
-  ball.x += ball.dx;
-  ball.y += ball.dy;
-
-  // Wall collisions
-  if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx = Math.abs(ball.dx); }
-  if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx = -Math.abs(ball.dx); }
-  if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); }
-
-  // Paddle collision
-  if (
-    ball.dy > 0 &&
-    ball.x > paddle.x && ball.x < paddle.x + paddle.w &&
-    ball.y + ball.r > paddle.y && ball.y - ball.r < paddle.y + paddle.h
-  ) {
-    const hit = (ball.x - (paddle.x + paddle.w / 2)) / (paddle.w / 2);
-    const angle = hit * 1.1;
-    const speed = Math.hypot(ball.dx, ball.dy);
-    ball.dx = Math.sin(angle) * speed;
-    ball.dy = -Math.abs(Math.cos(angle) * speed);
-    ball.y = paddle.y - ball.r - 1;
-  }
-
-  // Brick collisions
-  for (const b of bricks) {
-    if (!b.alive) continue;
-    if (
-      ball.x + ball.r > b.x && ball.x - ball.r < b.x + b.w &&
-      ball.y + ball.r > b.y && ball.y - ball.r < b.y + b.h
-    ) {
-      b.hits--;
-      if (b.hits <= 0) {
-        b.alive = false;
-        score += (level + 1) * 10;
-        updateHUD();
-        spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.color, 10);
-        flashTimer = 4;
-        // Check win
-        if (bricks.every(br => !br.alive)) {
-          setTimeout(() => nextLevel(), 600);
-          gameState = 'paused';
-        }
-      } else {
-        spawnParticles(b.x + b.w / 2, b.y + b.h / 2, b.color, 4);
-      }
-      // Reflect
-      const overlapL = (ball.x + ball.r) - b.x;
-      const overlapR = (b.x + b.w) - (ball.x - ball.r);
-      const overlapT = (ball.y + ball.r) - b.y;
-      const overlapB = (b.y + b.h) - (ball.y - ball.r);
-      const minH = Math.min(overlapL, overlapR);
-      const minV = Math.min(overlapT, overlapB);
-      if (minH < minV) ball.dx = -ball.dx;
-      else ball.dy = -ball.dy;
-      break;
-    }
-  }
-
-  // Ball out
-  if (ball.y - ball.r > canvas.height) {
-    loseLife();
-    gameState = 'dead';
-    setTimeout(() => {
-      if (lives > 0) {
-        resetBall();
-        resetPaddle();
-        gameState = 'playing';
-      }
-    }, 500);
-  }
-
-  updateParticles();
-  if (flashTimer > 0) flashTimer--;
-}
-
-// Drawing
-function drawBrick(b) {
-  const shine = b.hits < b.maxHits ? 0.4 : 1;
-  ctx.globalAlpha = shine;
-  ctx.fillStyle = b.color;
-
-  // Main fill
-  ctx.beginPath();
-  ctx.roundRect(b.x, b.y, b.w, b.h, 3);
-  ctx.fill();
-
-  // Highlight
-  ctx.globalAlpha = 0.35 * shine;
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.roundRect(b.x + 2, b.y + 2, b.w - 4, b.h / 2 - 1, 2);
-  ctx.fill();
-
-  // Glow
-  ctx.globalAlpha = 0.25 * shine;
-  ctx.shadowColor = b.color;
-  ctx.shadowBlur = 8;
-  ctx.strokeStyle = b.color;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.roundRect(b.x, b.y, b.w, b.h, 3);
-  ctx.stroke();
-  ctx.shadowBlur = 0;
-
-  ctx.globalAlpha = 1;
-}
-
-function drawPaddle() {
-  const lvl = LEVELS[level];
-  const col = lvl.colors[0];
-  ctx.fillStyle = '#e8eaf6';
-  ctx.shadowColor = col;
-  ctx.shadowBlur = 16;
-  ctx.beginPath();
-  ctx.roundRect(paddle.x, paddle.y, paddle.w, paddle.h, 5);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  ctx.fillStyle = col;
-  ctx.globalAlpha = 0.5;
-  ctx.beginPath();
-  ctx.roundRect(paddle.x + 4, paddle.y + 2, paddle.w - 8, 3, 2);
-  ctx.fill();
-  ctx.globalAlpha = 1;
-}
-
-function drawBall() {
-  // Trail
-  ball.trail.forEach((pt, i) => {
-    const a = (i / ball.trail.length) * 0.35;
-    ctx.globalAlpha = a;
-    ctx.fillStyle = LEVELS[level].colors[0];
-    ctx.beginPath();
-    ctx.arc(pt.x, pt.y, ball.r * (i / ball.trail.length), 0, Math.PI * 2);
-    ctx.fill();
+      const reel = document.getElementById('reel' + reelIdx);
+      reel.classList.remove('spinning');
+      const above = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      const below = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      setReelSymbols('reel' + reelIdx, above, results[reelIdx], below);
+      const midSym = reel.querySelectorAll('.symbol')[1];
+      midSym.classList.add('landing');
+      setTimeout(() => midSym.classList.remove('landing'), 300);
+      if (reelIdx === 2) setTimeout(() => resolveSpIn(results), 200);
+    }, delay);
   });
-  ctx.globalAlpha = 1;
-
-  // Ball glow
-  ctx.shadowColor = '#ffffff';
-  ctx.shadowBlur = 14;
-  ctx.fillStyle = '#ffffff';
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.shadowBlur = 0;
-
-  // Shine
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.beginPath();
-  ctx.arc(ball.x - ball.r * 0.3, ball.y - ball.r * 0.3, ball.r * 0.4, 0, Math.PI * 2);
-  ctx.fill();
 }
 
-function drawFlash() {
-  if (flashTimer > 0) {
-    ctx.globalAlpha = (flashTimer / 4) * 0.07;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.globalAlpha = 1;
+function resolveSpIn(results) {
+  const mult = calcMultiplier(results[0], results[1], results[2]);
+  const winAmt = Math.round(mult * BETS[currentBet] * 100) / 100;
+  if (winAmt > 0) {
+    balance += winAmt;
+    balance = Math.round(balance * 100) / 100;
+    document.getElementById('win-display').textContent = '+$' + winAmt.toFixed(2);
+    if (mult >= 10) {
+      showMessage('🎰 JACKPOT! ' + results.join(''), 3000);
+      document.getElementById('cabinet').classList.add('win-flash');
+      setTimeout(() => document.getElementById('cabinet').classList.remove('win-flash'), 1600);
+    } else if (mult >= 5) { showMessage('🔥 BIG WIN!', 2500);
+    } else { showMessage('✨ YOU WIN!', 2000); }
+  } else { showMessage('Try again...', 1500); }
+  updateUI(); spinning = false;
+  document.getElementById('spin-btn').disabled = false;
+  if (balance < BETS[0]) setTimeout(() => showEndScreen('lose'), 600);
+  else if (balance >= WIN_GOAL) setTimeout(() => showEndScreen('win'), 600);
+}
+
+function showEndScreen(type) {
+  const overlay = document.getElementById('overlay');
+  const title = document.getElementById('overlay-title');
+  const sub = document.getElementById('overlay-sub');
+  if (type === 'win') {
+    title.textContent = 'JACKPOT!'; title.className = 'overlay-title win-title';
+    sub.textContent = 'You reached $100 and beat the house!';
+  } else {
+    title.textContent = 'GAME OVER'; title.className = 'overlay-title lose-title';
+    sub.textContent = "You've gone broke. Better luck next time!";
+  }
+  overlay.classList.add('show');
+}
+
+function restart() {
+  balance = START_BALANCE; currentBet = 0; spinning = false;
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('spin-btn').disabled = false;
+  document.getElementById('win-display').textContent = '—';
+  document.querySelectorAll('.bet-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  document.getElementById('bet-display').textContent = '$0.20';
+  hideMessage(); updateUI();
+  for (let i = 0; i < 3; i++) {
+    setReelSymbols('reel' + i, '🍒', '🍒', '🍒');
+    document.getElementById('reel' + i).classList.remove('spinning');
   }
 }
 
-function drawGrid() {
-  ctx.strokeStyle = 'rgba(0,245,255,0.03)';
-  ctx.lineWidth = 1;
-  const sz = 40;
-  for (let x = 0; x < canvas.width; x += sz) {
-    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-  }
-  for (let y = 0; y < canvas.height; y += sz) {
-    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-  }
-}
-
-function drawLevelLabel() {
-  const name = LEVELS[level].name;
-  ctx.font = '700 0.6rem "Orbitron", sans-serif';
-  ctx.fillStyle = 'rgba(0,245,255,0.3)';
-  ctx.textAlign = 'center';
-  ctx.fillText(name, canvas.width / 2, 20);
-}
-
-function drawLaunchHint() {
-  if (!ballLaunched && gameState === 'playing') {
-    ctx.font = '0.65rem "Share Tech Mono", monospace';
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.textAlign = 'center';
-    ctx.fillText('CLICK or SPACE to launch', canvas.width / 2, canvas.height - 14);
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid();
-  drawFlash();
-  for (const b of bricks) { if (b.alive) drawBrick(b); }
-  if (gameState !== 'dead') { drawBall(); }
-  drawPaddle();
-  drawParticles();
-  drawLevelLabel();
-  drawLaunchHint();
-}
-
-function drawIdle() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawGrid();
-}
-
-function loop() {
-  update();
-  draw();
-  animId = requestAnimationFrame(loop);
-}
-
-// Init
-updateHUD();
-drawIdle();
-overlayTitle.textContent = 'BRICKBREAKER';
-overlayTitle.style.color = 'var(--glow-cyan)';
-overlayTitle.style.textShadow = '0 0 20px var(--glow-cyan)';
-overlaySub.innerHTML = 'Destroy all bricks to advance<br>through 5 sectors. Don\'t let<br>the ball fall!';
-overlayBtn.textContent = 'START GAME';
-overlayBtn.onclick = startGame;
+updateUI();
 </script>
 </body>
 </html>
