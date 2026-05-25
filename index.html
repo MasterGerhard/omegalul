@@ -2,340 +2,342 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lucky 7s Slot Machine</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #ffcc00;
+    --orange: #ff6600;
+    --red: #cc2200;
+    --green: #44ffaa;
+    --pink: #ff4488;
+    --purple-border: #3a2050;
+    --bg: #0a0a0f;
+    --cabinet-bg1: #1a1020;
+    --cabinet-bg2: #12091a;
+    --screen-bg: #080810;
+  }
 
   html, body {
     height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
   }
 
   body {
-    background: #0a0a0f;
-    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
+    /* use dvh so mobile browser chrome is excluded */
+    min-height: 100dvh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   }
 
-  .stars {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  /* subtle ambient glow behind cabinet */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; pointer-events: none;
     background:
       radial-gradient(ellipse at 20% 50%, rgba(255,215,0,0.04) 0%, transparent 50%),
       radial-gradient(ellipse at 80% 20%, rgba(255,50,50,0.04) 0%, transparent 40%),
       radial-gradient(ellipse at 60% 80%, rgba(100,50,255,0.04) 0%, transparent 40%);
   }
 
+  /* ── CABINET ── */
   .cabinet {
     position: relative;
     z-index: 1;
-    width: min(460px, 96vw);
-    background: linear-gradient(180deg, #1a1020 0%, #12091a 100%);
-    border-radius: 24px;
-    border: 2px solid #3a2050;
-    box-shadow:
-      0 0 60px rgba(180,0,255,0.15),
-      0 0 120px rgba(180,0,255,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.05);
-    padding: 16px 20px 20px;
+    /* width: fill available space up to 440px, leave 8px breathing room each side */
+    width: min(440px, calc(100vw - 16px));
+    /* height: fill dvh minus 16px, but never exceed a comfortable max */
+    max-height: min(820px, calc(100dvh - 16px));
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--cabinet-bg1) 0%, var(--cabinet-bg2) 100%);
+    border-radius: 20px;
+    border: 2px solid var(--purple-border);
+    box-shadow: 0 0 50px rgba(180,0,255,0.15), 0 0 100px rgba(180,0,255,0.07),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+    padding: 12px 16px 14px;
+    overflow: hidden;
   }
 
-  .marquee {
-    text-align: center;
-    margin-bottom: 8px;
-  }
+  /* ── HEADER ── */
+  .marquee { text-align: center; flex-shrink: 0; margin-bottom: 4px; }
 
   .marquee-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 10vw, 52px);
-    letter-spacing: 6px;
+    font-family: impact, 'Arial Narrow', sans-serif;
+    font-size: clamp(32px, 8.5vw, 48px);
+    letter-spacing: 5px;
     line-height: 1;
     background: linear-gradient(180deg, #fff700 0%, #ffaa00 50%, #ff6600 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 0 20px rgba(255,200,0,0.5));
+    filter: drop-shadow(0 0 16px rgba(255,200,0,0.45));
   }
 
   .marquee-sub {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
+    font-size: clamp(7px, 1.8vw, 9px);
     letter-spacing: 3px;
-    color: #ff4488;
-    margin-top: 1px;
+    color: var(--pink);
     text-transform: uppercase;
+    margin-top: 1px;
   }
 
+  /* ── LIGHTS ── */
   .lights-row {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin: 7px 0;
+    display: flex; justify-content: center; gap: 7px;
+    margin: 5px 0; flex-shrink: 0;
   }
-
   .bulb {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #ffcc00;
-    box-shadow: 0 0 6px #ffcc00;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 5px var(--gold);
     animation: blink 1.2s infinite alternate;
   }
-  .bulb:nth-child(even) { background: #ff4488; box-shadow: 0 0 6px #ff4488; animation-delay: 0.6s; }
-  .bulb:nth-child(3n) { background: #44ffaa; box-shadow: 0 0 6px #44ffaa; animation-delay: 0.3s; }
+  .bulb:nth-child(even)  { background: var(--pink);  box-shadow: 0 0 5px var(--pink);  animation-delay:.6s; }
+  .bulb:nth-child(3n)    { background: var(--green); box-shadow: 0 0 5px var(--green); animation-delay:.3s; }
+  @keyframes blink { to { opacity: 0.25; } }
 
-  @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
-
+  /* ── SCREEN FRAME ── */
   .screen-frame {
-    background: #080810;
-    border-radius: 14px;
-    border: 3px solid #2a1540;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120,0,200,0.2);
-    padding: 14px;
-    margin-bottom: 12px;
+    background: var(--screen-bg);
+    border-radius: 12px;
+    border: 2px solid #2a1540;
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.8), 0 0 16px rgba(120,0,200,0.18);
+    padding: 10px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
   }
 
+  /* ── REELS ── */
   .reels-container {
     display: flex;
-    gap: 8px;
-    height: 150px;
+    gap: 6px;
+    /* reels scale with viewport height so they never push controls off screen */
+    height: clamp(100px, 18dvh, 148px);
     background: #04040c;
-    border-radius: 10px;
+    border-radius: 8px;
     border: 2px solid #1a0a2a;
     overflow: hidden;
     position: relative;
   }
 
   .reel-wrapper {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
+    flex: 1; overflow: hidden; position: relative;
     border-right: 1px solid #1a0a2a;
   }
   .reel-wrapper:last-child { border-right: none; }
 
-  .reel { display: flex; flex-direction: column; transition: none; }
+  .reel { display: flex; flex-direction: column; }
+  .reel.spinning { animation: spin-tick 0.1s steps(1) infinite; }
 
-  .reel.spinning { animation: spin-blur 0.1s steps(1) infinite; }
-
-  @keyframes spin-blur {
+  /* step animation — values track symbol height (clamp ~33px–50px, use 44px midpoint) */
+  @keyframes spin-tick {
     0%   { transform: translateY(0); }
-    25%  { transform: translateY(-50px); }
-    50%  { transform: translateY(-100px); }
-    75%  { transform: translateY(-150px); }
+    25%  { transform: translateY(-44px); }
+    50%  { transform: translateY(-88px); }
+    75%  { transform: translateY(-132px); }
     100% { transform: translateY(0); }
   }
 
   .symbol {
     width: 100%;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    flex-shrink: 0;
-    user-select: none;
+    height: clamp(33px, 6dvh, 50px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(22px, 4.5dvh, 32px);
+    flex-shrink: 0; user-select: none;
   }
 
-  .win-line {
+  .win-line, .reel-highlight {
     position: absolute; top: 50%; left: 0; right: 0;
-    height: 54px; transform: translateY(-50%);
+    height: clamp(37px, 6.5dvh, 54px);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .win-line {
     border-top: 2px solid rgba(255,200,0,0.3);
     border-bottom: 2px solid rgba(255,200,0,0.3);
-    pointer-events: none; z-index: 5;
+    z-index: 5;
   }
+  .reel-highlight { background: rgba(255,215,0,0.05); z-index: 4; }
 
-  .reel-highlight {
-    position: absolute; top: 50%; left: 0; right: 0;
-    height: 54px; transform: translateY(-50%);
-    background: rgba(255,215,0,0.05);
-    pointer-events: none; z-index: 4;
-  }
-
+  /* ── PAYTABLE — horizontal scrolling strip ── */
   .paytable {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 5px;
-    margin-top: 10px;
+    margin-top: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* fade edges to hint scrollability */
+    -webkit-mask: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    padding: 0 4px 2px;
   }
+  .paytable::-webkit-scrollbar { display: none; }
 
   .pay-row {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.03);
+    gap: 2px;
+    background: rgba(255,255,255,0.04);
     border-radius: 7px;
     padding: 5px 8px;
-    border: 1px solid rgba(255,255,255,0.06);
-    font-size: 11px;
-    color: #aaa;
+    border: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
+    min-width: 52px;
   }
+  .pay-symbols { font-size: clamp(12px, 3vw, 16px); white-space: nowrap; }
+  .pay-mult { font-size: clamp(9px, 2vw, 11px); color: var(--gold); font-weight: 700; white-space: nowrap; }
 
-  .pay-symbols { font-size: 15px; letter-spacing: -2px; }
-  .pay-mult { margin-left: auto; font-family: 'Orbitron', monospace; font-size: 10px; color: #ffcc00; font-weight: 700; }
-
+  /* ── INFO BAR ── */
   .info-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+    display: flex; gap: 8px; margin-bottom: 8px; flex-shrink: 0;
   }
-
   .info-card {
-    flex: 1;
-    background: rgba(255,255,255,0.03);
+    flex: 1; background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 7px 10px;
-    text-align: center;
+    border-radius: 9px; padding: 6px 8px; text-align: center;
   }
-
   .info-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #666;
-    margin-bottom: 2px;
-    font-family: 'Orbitron', monospace;
+    font-size: clamp(7px, 1.8vw, 9px); letter-spacing: 2px;
+    text-transform: uppercase; color: #666; margin-bottom: 2px;
   }
-
   .info-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
+    font-size: clamp(14px, 4vw, 18px); font-weight: 700;
+    font-variant-numeric: tabular-nums; color: #fff;
+    font-family: 'Courier New', Courier, monospace;
   }
+  .info-value.balance { color: var(--green); }
+  .info-value.win     { color: var(--gold); }
 
-  .info-value.balance { color: #44ffaa; }
-  .info-value.win { color: #ffcc00; }
+  /* ── CONTROLS ── */
+  .controls { display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
 
-  .controls { display: flex; flex-direction: column; gap: 9px; }
-
-  .bet-section { display: flex; align-items: center; gap: 8px; }
-
+  .bet-section { display: flex; align-items: center; gap: 7px; }
   .bet-label {
-    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-    color: #666; font-family: 'Orbitron', monospace; white-space: nowrap;
+    font-size: clamp(7px, 1.8vw, 9px); letter-spacing: 2px;
+    text-transform: uppercase; color: #666; white-space: nowrap;
   }
-
-  .bet-buttons { display: flex; gap: 5px; flex: 1; }
+  .bet-buttons { display: flex; gap: 4px; flex: 1; }
 
   .bet-btn {
-    flex: 1; padding: 7px 2px;
+    flex: 1; padding: 6px 2px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 7px;
-    color: #ccc;
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: center;
+    border-radius: 6px; color: #ccc;
+    font-size: clamp(9px, 2.2vw, 11px);
+    cursor: pointer; transition: all 0.15s; text-align: center;
   }
-
-  .bet-btn:hover { background: rgba(255,200,0,0.1); border-color: rgba(255,200,0,0.3); color: #ffcc00; }
-  .bet-btn.active { background: rgba(255,200,0,0.15); border-color: #ffcc00; color: #ffcc00; box-shadow: 0 0 10px rgba(255,200,0,0.2); }
+  .bet-btn:hover  { background: rgba(255,200,0,0.1); border-color: rgba(255,200,0,0.3); color: var(--gold); }
+  .bet-btn.active { background: rgba(255,200,0,0.15); border-color: var(--gold); color: var(--gold); box-shadow: 0 0 8px rgba(255,200,0,0.2); }
 
   .spin-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(180deg, #ff6600 0%, #cc2200 100%);
-    border: none; border-radius: 12px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px; letter-spacing: 4px; color: #fff;
-    cursor: pointer; transition: all 0.15s;
-    box-shadow: 0 4px 20px rgba(255,80,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    width: 100%;
+    padding: clamp(10px, 2.5dvh, 15px);
+    background: linear-gradient(180deg, var(--orange) 0%, var(--red) 100%);
+    border: none; border-radius: 11px;
+    font-family: impact, 'Arial Narrow', sans-serif;
+    font-size: clamp(22px, 5.5vw, 30px);
+    letter-spacing: 4px; color: #fff; cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: 0 4px 18px rgba(255,80,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
     position: relative; overflow: hidden;
   }
-
   .spin-btn::after {
     content: ''; position: absolute; top: 0; left: -100%;
     width: 60%; height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
     transition: left 0.4s;
   }
-  .spin-btn:hover::after { left: 150%; }
-  .spin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,80,0,0.5); }
-  .spin-btn:active { transform: translateY(0); }
-  .spin-btn:disabled { background: linear-gradient(180deg, #444 0%, #222 100%); box-shadow: none; cursor: not-allowed; color: #888; }
+  .spin-btn:hover::after  { left: 150%; }
+  .spin-btn:hover         { transform: translateY(-1px); box-shadow: 0 7px 24px rgba(255,80,0,0.5); }
+  .spin-btn:active        { transform: translateY(0); }
+  .spin-btn:disabled      { background: linear-gradient(180deg,#444,#222); box-shadow:none; cursor:not-allowed; color:#888; }
 
   .message-area {
-    text-align: center; height: 22px;
+    text-align: center; height: 18px;
     display: flex; align-items: center; justify-content: center;
   }
-
   .message {
-    font-family: 'Orbitron', monospace; font-size: 11px; font-weight: 700;
-    letter-spacing: 2px; color: #ffcc00;
-    text-shadow: 0 0 20px rgba(255,200,0,0.5);
+    font-size: clamp(9px, 2.2vw, 12px); font-weight: 700;
+    letter-spacing: 2px; color: var(--gold);
+    text-shadow: 0 0 16px rgba(255,200,0,0.5);
     opacity: 0; transition: opacity 0.3s;
   }
   .message.visible { opacity: 1; }
 
+  /* ── PROGRESS ── */
   .progress-bar {
-    background: rgba(255,255,255,0.06); border-radius: 5px;
-    height: 5px; margin-top: 10px; overflow: hidden;
+    background: rgba(255,255,255,0.06); border-radius: 4px;
+    height: 4px; margin-top: 8px; overflow: hidden; flex-shrink: 0;
   }
   .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #44ffaa, #ffcc00);
-    border-radius: 5px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+    height: 100%; background: linear-gradient(90deg, var(--green), var(--gold));
+    border-radius: 4px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
   }
   .progress-labels {
     display: flex; justify-content: space-between;
-    margin-top: 3px; font-size: 9px; color: #555;
-    font-family: 'Orbitron', monospace;
+    margin-top: 3px; font-size: clamp(8px, 1.8vw, 9px); color: #555;
   }
 
+  /* ── END OVERLAY ── */
   .overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.9);
     z-index: 100; display: none; align-items: center;
-    justify-content: center; flex-direction: column; gap: 16px;
+    justify-content: center; flex-direction: column; gap: 14px;
   }
   .overlay.show { display: flex; }
 
   .overlay-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 72px; letter-spacing: 6px; text-align: center; line-height: 1;
+    font-family: impact, 'Arial Narrow', sans-serif;
+    font-size: clamp(52px, 14vw, 80px);
+    letter-spacing: 5px; text-align: center; line-height: 1;
   }
   .overlay-title.win-title {
-    background: linear-gradient(180deg, #fff700 0%, #ffaa00 100%);
+    background: linear-gradient(180deg, #fff700, #ffaa00);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text; filter: drop-shadow(0 0 40px rgba(255,200,0,0.6));
+    background-clip: text; filter: drop-shadow(0 0 32px rgba(255,200,0,0.55));
   }
-  .overlay-title.lose-title { color: #ff2244; filter: drop-shadow(0 0 40px rgba(255,0,50,0.5)); }
+  .overlay-title.lose-title { color: #ff2244; filter: drop-shadow(0 0 32px rgba(255,0,50,0.5)); }
 
-  .overlay-sub { font-family: 'Orbitron', monospace; font-size: 12px; letter-spacing: 2px; color: #aaa; text-align: center; }
+  .overlay-sub { font-size: clamp(11px, 3vw, 14px); letter-spacing: 2px; color: #aaa; text-align: center; padding: 0 24px; }
 
   .restart-btn {
-    padding: 14px 44px;
-    background: linear-gradient(180deg, #ff6600 0%, #cc2200 100%);
-    border: none; border-radius: 12px;
-    font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 4px; color: #fff;
-    cursor: pointer; box-shadow: 0 4px 24px rgba(255,80,0,0.4); transition: all 0.15s; margin-top: 6px;
+    padding: 13px 40px;
+    background: linear-gradient(180deg, var(--orange), var(--red));
+    border: none; border-radius: 11px;
+    font-family: impact, 'Arial Narrow', sans-serif;
+    font-size: clamp(20px, 5vw, 26px); letter-spacing: 4px; color: #fff;
+    cursor: pointer; box-shadow: 0 4px 20px rgba(255,80,0,0.4);
+    transition: all 0.15s; margin-top: 6px;
   }
-  .restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(255,80,0,0.5); }
+  .restart-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,80,0,0.5); }
 
+  /* ── WIN FLASH ── */
   .win-flash { animation: winPulse 0.5s ease-out 3; }
-
   @keyframes winPulse {
-    0%   { box-shadow: 0 0 60px rgba(180,0,255,0.15), 0 0 120px rgba(180,0,255,0.08); }
-    50%  { box-shadow: 0 0 80px rgba(255,215,0,0.4), 0 0 160px rgba(255,215,0,0.2); }
-    100% { box-shadow: 0 0 60px rgba(180,0,255,0.15), 0 0 120px rgba(180,0,255,0.08); }
+    0%,100% { box-shadow: 0 0 50px rgba(180,0,255,0.15), 0 0 100px rgba(180,0,255,0.07); }
+    50%      { box-shadow: 0 0 70px rgba(255,215,0,0.4), 0 0 140px rgba(255,215,0,0.2); }
   }
 
   @keyframes symbolLand {
-    0% { transform: scale(1.3); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 1; }
+    0%   { transform: scale(1.25); opacity: 0.5; }
+    100% { transform: scale(1);    opacity: 1; }
   }
-  .symbol.landing { animation: symbolLand 0.2s ease-out; }
+  .symbol.landing { animation: symbolLand 0.18s ease-out; }
 </style>
 </head>
 <body>
 
-<div class="stars"></div>
-
 <div class="cabinet" id="cabinet">
+
   <div class="marquee">
     <div class="marquee-title">Lucky 7s</div>
     <div class="marquee-sub">Classic Slots &bull; 98% RTP</div>
@@ -349,34 +351,29 @@
   </div>
 
   <div class="screen-frame">
-    <div class="reels-container" id="reels-container">
+    <div class="reels-container">
       <div class="reel-wrapper">
         <div class="reel" id="reel0">
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div><div class="symbol">🍒</div><div class="symbol">🍒</div>
         </div>
         <div class="reel-highlight"></div>
       </div>
       <div class="reel-wrapper">
         <div class="reel" id="reel1">
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div><div class="symbol">🍒</div><div class="symbol">🍒</div>
         </div>
         <div class="reel-highlight"></div>
       </div>
       <div class="reel-wrapper">
         <div class="reel" id="reel2">
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
-          <div class="symbol">🍒</div>
+          <div class="symbol">🍒</div><div class="symbol">🍒</div><div class="symbol">🍒</div>
         </div>
         <div class="reel-highlight"></div>
       </div>
       <div class="win-line"></div>
     </div>
 
+    <!-- paytable as horizontal scrolling strip -->
     <div class="paytable">
       <div class="pay-row"><span class="pay-symbols">7️⃣7️⃣7️⃣</span><span class="pay-mult">×100</span></div>
       <div class="pay-row"><span class="pay-symbols">⭐⭐⭐</span><span class="pay-mult">×20</span></div>
@@ -385,7 +382,7 @@
       <div class="pay-row"><span class="pay-symbols">🍋🍋🍋</span><span class="pay-mult">×4</span></div>
       <div class="pay-row"><span class="pay-symbols">🍒🍒🍒</span><span class="pay-mult">×3</span></div>
       <div class="pay-row"><span class="pay-symbols">🍒🍒</span><span class="pay-mult">×1.5</span></div>
-      <div class="pay-row"><span class="pay-symbols">7️⃣</span><span class="pay-mult">×1.5×</span></div>
+      <div class="pay-row"><span class="pay-symbols">7️⃣</span><span class="pay-mult">×1.5</span></div>
     </div>
   </div>
 
@@ -424,13 +421,14 @@
   </div>
 
   <div class="progress-bar">
-    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    <div class="progress-fill" id="progress-fill" style="width:0%"></div>
   </div>
   <div class="progress-labels">
     <span>$0</span>
     <span>Goal: $100</span>
   </div>
-</div>
+
+</div><!-- /cabinet -->
 
 <div class="overlay" id="overlay">
   <div class="overlay-title" id="overlay-title"></div>
@@ -439,60 +437,47 @@
 </div>
 
 <script>
-const BETS = [0.20, 0.50, 1.00, 2.00, 5.00];
-const START_BALANCE = 20;
-const WIN_GOAL = 100;
-const RTP = 0.98;
-const SYMBOLS = ['7️⃣', '⭐', '🔔', '🍇', '🍋', '🍒'];
-const WEIGHTS = [2, 4, 7, 12, 18, 30];
-const TOTAL_WEIGHT = WEIGHTS.reduce((a, b) => a + b, 0);
-const PAYOUTS = { '7️⃣7️⃣7️⃣': 100, '⭐⭐⭐': 20, '🔔🔔🔔': 10, '🍇🍇🍇': 5, '🍋🍋🍋': 4, '🍒🍒🍒': 3 };
+const BETS        = [0.20, 0.50, 1.00, 2.00, 5.00];
+const START_BAL   = 20;
+const WIN_GOAL    = 100;
+const RTP         = 0.98;
+const SYMBOLS     = ['7️⃣','⭐','🔔','🍇','🍋','🍒'];
+const WEIGHTS     = [2, 4, 7, 12, 18, 30];
+const TOT_W       = WEIGHTS.reduce((a,b) => a+b, 0);
+const PAYOUTS     = {'7️⃣7️⃣7️⃣':100,'⭐⭐⭐':20,'🔔🔔🔔':10,'🍇🍇🍇':5,'🍋🍋🍋':4,'🍒🍒🍒':3};
 
-let balance = START_BALANCE;
+let balance    = START_BAL;
 let currentBet = 0;
-let spinning = false;
-let msgTimer = null;
+let spinning   = false;
+let msgTimer   = null;
 
 function weightedRandom() {
-  let r = Math.random() * TOTAL_WEIGHT;
+  let r = Math.random() * TOT_W;
   for (let i = 0; i < WEIGHTS.length; i++) { r -= WEIGHTS[i]; if (r <= 0) return i; }
   return SYMBOLS.length - 1;
 }
 
-function calcMultiplier(s0, s1, s2) {
-  const key = s0 + s1 + s2;
+function calcMult(s0, s1, s2) {
+  const key = s0+s1+s2;
   if (PAYOUTS[key]) return PAYOUTS[key];
-  const count7 = [s0, s1, s2].filter(s => s === '7️⃣').length;
-  if (count7 >= 1 && (s0 === '7️⃣' || s1 === '7️⃣')) return 1.5;
-  const cherries = [s0, s1, s2].filter(s => s === '🍒');
-  if (cherries.length === 2) return 1.5;
+  if ([s0,s1,s2].filter(s=>s==='7️⃣').length >= 1 && (s0==='7️⃣'||s1==='7️⃣')) return 1.5;
+  if ([s0,s1,s2].filter(s=>s==='🍒').length === 2) return 1.5;
   return 0;
 }
 
-function getExpectedRTP() {
-  let totalEV = 0;
-  const n = SYMBOLS.length;
-  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) for (let k = 0; k < n; k++) {
-    const p = (WEIGHTS[i]/TOTAL_WEIGHT)*(WEIGHTS[j]/TOTAL_WEIGHT)*(WEIGHTS[k]/TOTAL_WEIGHT);
-    totalEV += p * calcMultiplier(SYMBOLS[i], SYMBOLS[j], SYMBOLS[k]);
-  }
-  return totalEV;
-}
-
-const BASE_RTP = getExpectedRTP();
-
 function spinSymbols() {
   const raw = [weightedRandom(), weightedRandom(), weightedRandom()];
-  const naturalMult = calcMultiplier(SYMBOLS[raw[0]], SYMBOLS[raw[1]], SYMBOLS[raw[2]]);
-  const naturalWin = naturalMult * BETS[currentBet];
-  const naturalEV = naturalWin - BETS[currentBet];
-  const targetEV = (RTP - 1) * BETS[currentBet];
-  const evGap = targetEV - naturalEV;
-  const blendFactor = Math.min(1, Math.abs(evGap) / (BETS[currentBet] * 0.5));
-  const shouldNudge = Math.random() < blendFactor * 0.4;
-  if (shouldNudge) {
-    if (evGap > 0 && naturalMult === 0) { if (Math.random() < 0.3) { raw[0] = SYMBOLS.indexOf('🍒'); raw[1] = SYMBOLS.indexOf('🍒'); } }
-    else if (evGap < 0 && naturalMult > 3) { raw[2] = Math.floor(Math.random() * 3) + 3; }
+  const natMult = calcMult(SYMBOLS[raw[0]], SYMBOLS[raw[1]], SYMBOLS[raw[2]]);
+  const natEV   = natMult * BETS[currentBet] - BETS[currentBet];
+  const targEV  = (RTP - 1) * BETS[currentBet];
+  const gap     = targEV - natEV;
+  const blend   = Math.min(1, Math.abs(gap) / (BETS[currentBet] * 0.5));
+  if (Math.random() < blend * 0.4) {
+    if (gap > 0 && natMult === 0 && Math.random() < 0.3) {
+      raw[0] = SYMBOLS.indexOf('🍒'); raw[1] = SYMBOLS.indexOf('🍒');
+    } else if (gap < 0 && natMult > 3) {
+      raw[2] = Math.floor(Math.random() * 3) + 3;
+    }
   }
   return raw.map(i => SYMBOLS[i]);
 }
@@ -500,102 +485,97 @@ function spinSymbols() {
 function setBet(idx) {
   if (spinning) return;
   currentBet = idx;
-  document.querySelectorAll('.bet-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
-  document.getElementById('bet-display').textContent = '$' + BETS[idx].toFixed(2);
+  document.querySelectorAll('.bet-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('bet-display').textContent = '$'+BETS[idx].toFixed(2);
 }
 
-function setReelSymbols(reelId, top, mid, bottom) {
-  const reel = document.getElementById(reelId);
-  const syms = reel.querySelectorAll('.symbol');
-  syms[0].textContent = top; syms[1].textContent = mid; syms[2].textContent = bottom;
+function setReelSymbols(id, top, mid, bot) {
+  const s = document.getElementById(id).querySelectorAll('.symbol');
+  s[0].textContent = top; s[1].textContent = mid; s[2].textContent = bot;
 }
 
-function showMessage(text, duration = 2000) {
+function showMsg(text, dur=2000) {
   const el = document.getElementById('message');
   el.textContent = text; el.classList.add('visible');
   clearTimeout(msgTimer);
-  if (duration > 0) msgTimer = setTimeout(() => el.classList.remove('visible'), duration);
+  if (dur > 0) msgTimer = setTimeout(() => el.classList.remove('visible'), dur);
 }
-
-function hideMessage() { document.getElementById('message').classList.remove('visible'); }
+function hideMsg() { document.getElementById('message').classList.remove('visible'); }
 
 function updateUI() {
-  document.getElementById('balance-display').textContent = '$' + balance.toFixed(2);
-  const pct = Math.min(100, Math.max(0, (balance / WIN_GOAL) * 100));
-  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('balance-display').textContent = '$'+balance.toFixed(2);
+  document.getElementById('progress-fill').style.width = Math.min(100, Math.max(0, balance/WIN_GOAL*100))+'%';
 }
 
 function spin() {
   if (spinning) return;
-  if (balance < BETS[currentBet]) { showMessage('INSUFFICIENT FUNDS'); return; }
-  spinning = true; hideMessage();
+  if (balance < BETS[currentBet]) { showMsg('INSUFFICIENT FUNDS'); return; }
+  spinning = true; hideMsg();
   document.getElementById('spin-btn').disabled = true;
   document.getElementById('win-display').textContent = '—';
-  balance -= BETS[currentBet];
-  balance = Math.round(balance * 100) / 100;
+  balance = Math.round((balance - BETS[currentBet]) * 100) / 100;
   updateUI();
-  const results = spinSymbols();
-  for (let i = 0; i < 3; i++) document.getElementById('reel' + i).classList.add('spinning');
-  [600, 900, 1200].forEach((delay, reelIdx) => {
+  const res = spinSymbols();
+  for (let i=0;i<3;i++) document.getElementById('reel'+i).classList.add('spinning');
+  [600,900,1200].forEach((delay, ri) => {
     setTimeout(() => {
-      const reel = document.getElementById('reel' + reelIdx);
+      const reel = document.getElementById('reel'+ri);
       reel.classList.remove('spinning');
-      const above = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-      const below = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-      setReelSymbols('reel' + reelIdx, above, results[reelIdx], below);
-      const midSym = reel.querySelectorAll('.symbol')[1];
-      midSym.classList.add('landing');
-      setTimeout(() => midSym.classList.remove('landing'), 300);
-      if (reelIdx === 2) setTimeout(() => resolveSpIn(results), 200);
+      setReelSymbols('reel'+ri,
+        SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)],
+        res[ri],
+        SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]);
+      const mid = reel.querySelectorAll('.symbol')[1];
+      mid.classList.add('landing');
+      setTimeout(() => mid.classList.remove('landing'), 200);
+      if (ri === 2) setTimeout(() => resolve(res), 200);
     }, delay);
   });
 }
 
-function resolveSpIn(results) {
-  const mult = calcMultiplier(results[0], results[1], results[2]);
+function resolve(res) {
+  const mult   = calcMult(res[0], res[1], res[2]);
   const winAmt = Math.round(mult * BETS[currentBet] * 100) / 100;
   if (winAmt > 0) {
-    balance += winAmt;
-    balance = Math.round(balance * 100) / 100;
-    document.getElementById('win-display').textContent = '+$' + winAmt.toFixed(2);
+    balance = Math.round((balance + winAmt) * 100) / 100;
+    document.getElementById('win-display').textContent = '+$'+winAmt.toFixed(2);
     if (mult >= 10) {
-      showMessage('🎰 JACKPOT! ' + results.join(''), 3000);
+      showMsg('🎰 JACKPOT! '+res.join(''), 3000);
       document.getElementById('cabinet').classList.add('win-flash');
       setTimeout(() => document.getElementById('cabinet').classList.remove('win-flash'), 1600);
-    } else if (mult >= 5) { showMessage('🔥 BIG WIN!', 2500);
-    } else { showMessage('✨ YOU WIN!', 2000); }
-  } else { showMessage('Try again...', 1500); }
+    } else if (mult >= 5) { showMsg('🔥 BIG WIN!', 2500);
+    } else                { showMsg('✨ YOU WIN!', 2000); }
+  } else { showMsg('Try again...', 1500); }
   updateUI(); spinning = false;
   document.getElementById('spin-btn').disabled = false;
-  if (balance < BETS[0]) setTimeout(() => showEndScreen('lose'), 600);
-  else if (balance >= WIN_GOAL) setTimeout(() => showEndScreen('win'), 600);
+  if (balance < BETS[0])  setTimeout(() => endScreen('lose'), 600);
+  else if (balance >= WIN_GOAL) setTimeout(() => endScreen('win'),  600);
 }
 
-function showEndScreen(type) {
-  const overlay = document.getElementById('overlay');
-  const title = document.getElementById('overlay-title');
-  const sub = document.getElementById('overlay-sub');
+function endScreen(type) {
+  const t = document.getElementById('overlay-title');
+  const s = document.getElementById('overlay-sub');
   if (type === 'win') {
-    title.textContent = 'JACKPOT!'; title.className = 'overlay-title win-title';
-    sub.textContent = 'You reached $100 and beat the house!';
+    t.textContent = 'JACKPOT!'; t.className = 'overlay-title win-title';
+    s.textContent = 'You reached $100 and beat the house!';
   } else {
-    title.textContent = 'GAME OVER'; title.className = 'overlay-title lose-title';
-    sub.textContent = "You've gone broke. Better luck next time!";
+    t.textContent = 'GAME OVER'; t.className = 'overlay-title lose-title';
+    s.textContent = "You can't afford the minimum bet. Better luck next time!";
   }
-  overlay.classList.add('show');
+  document.getElementById('overlay').classList.add('show');
 }
 
 function restart() {
-  balance = START_BALANCE; currentBet = 0; spinning = false;
+  balance = START_BAL; currentBet = 0; spinning = false;
   document.getElementById('overlay').classList.remove('show');
   document.getElementById('spin-btn').disabled = false;
   document.getElementById('win-display').textContent = '—';
-  document.querySelectorAll('.bet-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+  document.querySelectorAll('.bet-btn').forEach((b,i) => b.classList.toggle('active', i===0));
   document.getElementById('bet-display').textContent = '$0.20';
-  hideMessage(); updateUI();
-  for (let i = 0; i < 3; i++) {
-    setReelSymbols('reel' + i, '🍒', '🍒', '🍒');
-    document.getElementById('reel' + i).classList.remove('spinning');
+  hideMsg(); updateUI();
+  for (let i=0;i<3;i++) {
+    setReelSymbols('reel'+i,'🍒','🍒','🍒');
+    document.getElementById('reel'+i).classList.remove('spinning');
   }
 }
 
